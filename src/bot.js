@@ -1,17 +1,31 @@
 require('dotenv').config();
 
-const { Client } = require('discord.js');
-const client = new Client();
+const { Client,WebhookClient } = require('discord.js');
+const client = new Client({
+    partials: ['MESSAGE', 'REACTION']
+});
+
+const webhookClient = new WebhookClient(
+    process.env.WEBHOOK_ID,
+    process.env.WEBHOOK_TOKEN
+)
 
 const PREFIX = '$'
 
 client.on('ready', () => {
-    console.log(`${client.user.tag} has logged in!`)
+    console.log(`${client.user.tag} has logged in!`);
+
 });
+
 
 client.on('message', async (message) => {
     if (message.author.bot) return;
     // console.log(`[${message.author.tag}] : ${message.content} `);
+
+    if(message.content){
+        message.react('❤️')
+    }
+
     if (message.content.startsWith(PREFIX)) {
         const [CMD_NAME, ...args] = message.content
             .trim()
@@ -54,8 +68,58 @@ client.on('message', async (message) => {
                 message.channel.send('Error: Either I do not have permissions or the user was not found')
             }
         }
-        console.log(CMD_NAME);
-        console.log(args);
+        else if(CMD_NAME==='announce') {
+            
+             const msg = args.join(' ')
+             webhookClient.send(msg);
+        }
+
+    }
+});
+
+client.on('messageReactionAdd', (reaction, user) => {
+
+    const { name } = reaction.emoji;
+    const member = reaction.message.guild.members.cache.get(user.id);
+   
+    if (reaction.message.id === '842335156835713024') {
+        switch (name) {
+            case '🍉':
+                member.roles.add('842333187174301726');
+                break;
+            case '🍑':
+                member.roles.add('842333635357179934')
+                break;
+            case '🍇':
+                member.roles.add('842333712133783592')
+                break;
+            case '🍓':
+                member.roles.add('842333260063572009')
+                break;
+        }
+    }
+})
+
+client.on('messageReactionRemove', (reaction, user) => {
+
+    const { name } = reaction.emoji;
+    const member = reaction.message.guild.members.cache.get(user.id);
+    
+    if (reaction.message.id === '842335156835713024') {
+        switch (name) {
+            case '🍉':
+                member.roles.remove('842333187174301726');
+                break;
+            case '🍑':
+                member.roles.remove('842333635357179934')
+                break;
+            case '🍇':
+                member.roles.remove('842333712133783592')
+                break;
+            case '🍓':
+                member.roles.remove('842333260063572009')
+                break;
+        }
     }
 })
 
