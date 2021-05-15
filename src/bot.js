@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 const { Client,WebhookClient } = require('discord.js');
+const welcome = require('./welcome');
 const client = new Client({
     partials: ['MESSAGE', 'REACTION']
 });
@@ -15,6 +16,8 @@ const PREFIX = '$'
 client.on('ready', () => {
     console.log(`${client.user.tag} has logged in!`);
 
+    welcome(client);
+
 });
 
 
@@ -24,6 +27,10 @@ client.on('message', async (message) => {
 
     if(message.content){
         message.react('❤️')
+    }
+
+    if(message.conten === 'hi'||'Hi'||'Hello'||'hello'||'hey'||'Hey'){
+        message.channel.send('Hello there..')
     }
 
     if (message.content.startsWith(PREFIX)) {
